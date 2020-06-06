@@ -1,0 +1,128 @@
+#include<iostream>
+#include<cstdlib>
+#include<conio.h>
+#include<windows.h>    //  gotoxy 和HideCursor的头文件
+using namespace std;
+int sizex=50;//空间的宽
+int sizey=40;//空间的高度；
+int plane_x=sizex/2;//飞机的位置x，y；
+int plane_y=sizey/2;
+int gunx=0,guny=0;
+int speed=0;
+int score=0;
+int dp_x=rand()%sizex,dp_y=0;  //敌机位置
+char ss;//输入按键；
+void notin();
+void in();
+void gotoxy(int x,int y)  //清屏，屏幕不抖动
+     {
+	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD pos;
+	pos.X=x;
+	pos.Y =y;
+	SetConsoleCursorPosition(handle,pos);
+}
+void HideCursor()           //隐藏光标；
+{
+	CONSOLE_CURSOR_INFO cursor_info={1,0};//第二个值为0 表示隐藏光标
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE),&cursor_info);
+}
+void show()//初始化显示
+{
+         gotoxy(0,0) ;
+         	HideCursor()   ;
+    for(int y=1;y<=sizey;++y)
+    
+	{	for(int x=1;x<=sizex;++x)
+		{
+
+			if(x==plane_x&&y==plane_y)
+			{
+				cout<<"*" ;
+			}
+        	else  if(x==gunx&&y==guny)
+			{
+				cout<<"|";
+
+			}
+			else if(x==dp_x&&y==dp_y)
+			{
+				cout<<"&"                 ;
+			}
+			else
+			{
+				cout<<" ";
+			}
+		}
+		  cout<<endl;
+
+		}
+		cout<<"得分："<<score;
+}
+void in()
+{//和输入有关的
+if(kbhit())
+{
+
+	  ss=getch();
+	  switch(ss)
+	  {
+		   case'w':   if(plane_y>1)plane_y--;break;           //控制方向同时设置边界
+		   case's':   if(plane_y<sizey)plane_y++;break;
+		   case'a':   if(plane_x>1)plane_x--;break;
+		   case'd':   if(plane_x<sizex)plane_x++;break;
+		   case' ':   gunx=plane_x,guny=plane_y-1;break;
+	  }
+}
+}
+void notin()
+{//和输入无关的；
+
+      if(guny!=0)
+     {
+	   guny--;
+
+
+}
+if(speed<5)   //把敌机来临的速度变成子弹飞行的1/5倍
+speed++;
+if(speed==5)
+{
+	if(dp_y<sizey)
+{
+	dp_y++;
+		 	speed=0;
+}
+if(dp_y==sizey)
+{
+	dp_y=0;
+	dp_x=rand()%sizex;//改变生成的敌机位
+	speed=0;
+
+}
+}
+if(gunx==dp_x&&guny==dp_y)
+{
+
+	dp_y=0;
+	guny=-1 ;
+		dp_x=rand()%sizex;      //当击中敌机
+			score++;
+}
+}
+int main()
+{
+
+      while(1)
+{
+
+
+		    show();
+		    notin();
+		    in() ;
+
+
+
+}
+		return 0;
+}
